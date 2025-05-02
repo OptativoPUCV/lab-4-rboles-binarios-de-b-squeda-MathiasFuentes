@@ -195,5 +195,23 @@ Pair * firstTreeMap(TreeMap * tree) {
 }
 
 Pair * nextTreeMap(TreeMap * tree) {
-    return NULL;
+    if (tree == NULL || tree->current == NULL) return NULL;
+
+    TreeNode* current = tree->current;
+
+    if (current->right != NULL) {                           // Si tiene hijo derecho, el siguiente sucesor será el mínimo de este subarbol.
+        TreeNode* next = minimum(current->right); 
+        tree->current = next;                               // Se actualiza el current y se retorna el pair del sucesor.
+        return next->pair;
+    }
+
+    TreeNode* parent = current->parent;
+    while (parent != NULL && current == parent->right) {    // Si no tiene hijo derecho, su sucesor será uno de sus padres.
+        current = parent;
+        parent = parent->parent;
+    }
+
+    tree->current = parent;
+    return (parent != NULL) ? parent->pair : NULL;          // Si se encontró el sucesor en padres se retorna, sino, se retorna NULL.
 }
+
