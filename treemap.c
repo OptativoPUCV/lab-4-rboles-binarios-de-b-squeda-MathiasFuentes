@@ -196,8 +196,8 @@ Pair * upperBound(TreeMap * tree, void* key) {
         
         // Algoritmo para buscar el nodo en cuestión.
         if (tree->lower_than(key, aux->pair->key)){
-            ub_node = aux;
-            aux = aux->left;
+            ub_node = aux;      // Guardar el nodo con key más cercano al key buscado.
+            aux = aux->left;    // Seguir buscando hasta que se encuentre o se acabe el arbol.
         }
         else {
             aux = aux->right;
