@@ -48,14 +48,6 @@ TreeMap * createTreeMap(int (*lower_than) (void* key1, void* key2)) {
     return new;                                             // Se retorna el arbol.
 }
 
-/*
-3.- Implemente la función void insertTreeMap(TreeMap * tree, void* key, void * value). 
-Esta función inserta un nuevo dato (key,value) en el árbol y hace que el current apunte al nuevo nodo. 
-Para insertar un dato, primero debe realizar una búsqueda para encontrar donde debería ubicarse. 
-Luego crear el nuevo nodo y enlazarlo. 
-
-Si la clave del dato ya existe retorne sin hacer nada (recuerde que el mapa no permite claves repetidas).
-*/
 void insertTreeMap(TreeMap * tree, void* key, void * value) {
 
     if (tree == NULL) return;                               // Si el tree es NULL simplemente se retorna sin hacer nada.
@@ -96,24 +88,60 @@ void insertTreeMap(TreeMap * tree, void* key, void * value) {
     tree->current = newNode;                                // Se actualiza el current.
 }
 
-/*4.- Implemente la función TreeNode * minimum(TreeNode * x). 
-Esta función retorna el nodo con la mínima clave ubicado en el subárbol con raiz x. 
-Para obtener el nodo tiene que, a partir del nodo x, irse por la rama izquierda hasta llegar al final del subárbol.
- Si x no tiene hijo izquierdo se retorna el mismo nodo.*/
-
 TreeNode * minimum(TreeNode * x){
-    if (x == NULL) return NULL;
+    if (x == NULL) return NULL;                             // Se valida que el nodo entrante no sea ni NULL y que tenga hijo izquierdo.
     if (x->left == NULL) return x;
 
-    TreeNode* aux = x;
+    TreeNode* aux = x;                                      // Se usa un nodo auxiliar para buscar el mínimo en el subarbol.
     while (aux->left != NULL){
         aux = aux->left;
-    }
-    return aux;
+    }   
+    return aux;                                             // Se retorna el nodo encontrado (el de valor key mínimo).
 }
 
 
 void removeNode(TreeMap * tree, TreeNode* node) {
+    if (tree == NULL || node == NULL) return;
+
+    // Primer caso, nodo sin hijos:
+    if (node->left == NULL && node->right == NULL){
+        if (node->parent == NULL) tree->root = NULL;
+        else if (node->parent->left == node) node->parent->left = NULL;
+        else if (node->parent->right == node) node->parent->right = NULL;
+        free(node->pair);
+        free(node);    
+        return;
+    }
+
+    // Segundo caso, nodo con un hijo:
+    if ((node->left != NULL && node->right == NULL) || (node->right != NULL && node->left == NULL)) {
+        TreeNode* child = (node->left != NULL) ? node->left : node->right; // Guardar el hijo del nodo a eliminar.
+
+        if (node->parent == NULL) {             // Si el nodo a eliminar es la raíz, simplemente lo reemplazamos.
+            tree->root = child;
+            child->parent = NULL;
+        }
+
+        else {                                  // Aquí simplemente se reemplaza el nodo a eliminar por su hijo,
+            if (node->parent->left == node)     // si el ABB está bien implementado, no debería presentar problemas.
+                node->parent->left = child;
+            else
+                node->parent->right = child;
+
+            // child->parent = node->parent;
+        }
+        free(node->pair);
+        free(node);    
+        return;
+    }
+
+    // Tercer caso, nodo con 2 hijos:
+    if ((node->left != NULL && node->right != NULL)){
+        TreeNode* succesor = minimum(node->right);
+        node->pair = succesor;
+        removeNode(tree, succesor);
+        return;
+    }
 
 }
 
