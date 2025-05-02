@@ -48,9 +48,52 @@ TreeMap * createTreeMap(int (*lower_than) (void* key1, void* key2)) {
     return new;                                             // Se retorna el arbol.
 }
 
+/*
+3.- Implemente la función void insertTreeMap(TreeMap * tree, void* key, void * value). 
+Esta función inserta un nuevo dato (key,value) en el árbol y hace que el current apunte al nuevo nodo. 
+Para insertar un dato, primero debe realizar una búsqueda para encontrar donde debería ubicarse. 
+Luego crear el nuevo nodo y enlazarlo. 
 
+Si la clave del dato ya existe retorne sin hacer nada (recuerde que el mapa no permite claves repetidas).
+*/
 void insertTreeMap(TreeMap * tree, void* key, void * value) {
 
+    if (tree == NULL) return;                               // Si el tree es NULL simplemente se retorna sin hacer nada.
+    TreeNode* newNode = createTreeNode(key, value);         // Se crea el nuevo nodo con la función createTreeNode.
+
+    if (tree->root == NULL){                                // Si el arbol está vacío se guarda el nuevo nodo como root.
+        tree->root = newNode;
+        tree->current = newNode;
+        return;
+    }
+
+    TreeNode* aux = tree->root;                             // Se crea un nodo auxiliar desde root para la búsqueda.
+    TreeNode* parent = NULL;                                // Se crea un nodo parent para saber cual será el padre del nodo a insertar.
+    
+    while (aux != NULL) {                                   // Ciclo que compara por key hasta encontrar una posición válida para insertar.
+        if (is_equal(tree, aux->pair->key, key)){           // Si hay una clave igual, se libera la memoria reservada y se retorna.
+            free(newNode);
+            free(newNode->pair);
+            return;
+        }
+
+        parent = aux;                                       // Se guarda el parent antes de avanzar.
+        if (tree->lower_than(key, aux->pair->key)){
+            aux = aux->left;
+        }
+        else {
+            aux = aux->right;
+        }
+    }
+
+    newNode->parent = parent;                               // Se asigna el parent al nuevo nodo.
+    if (tree->lower_than(key, parent->pair->key)) {         // Se usa lower_than para saber si va a la izquierda o a la derecha.
+        parent->left = newNode;
+    } else {
+        parent->right = newNode;
+    }
+
+    tree->current = newNode;                                // Se actualiza el current.
 }
 
 TreeNode * minimum(TreeNode * x){
@@ -72,21 +115,13 @@ void eraseTreeMap(TreeMap * tree, void* key){
 
 }
 
-
-/*
-2.- Implemente la función Pair* searchTreeMap(TreeMap* tree, void* key), 
-la cual busca el nodo con clave igual a key y retorna el Pair asociado al nodo. 
-Si no se encuentra la clave retorna NULL. 
-Recuerde hacer que el current apunte al nodo encontrado.
-*/
-
 Pair * searchTreeMap(TreeMap * tree, void* key) {
-    if (tree == NULL || tree->root == NULL) return NULL; // Retornar NULL en caso de que esté vacío.
-    TreeNode* aux = tree->root;
+    if (tree == NULL || tree->root == NULL) return NULL;    // Retornar NULL en caso de que esté vacío.
+    TreeNode* aux = tree->root;                             // Se crea un nodo auxiliar desde root para la búsqueda.
     
-    while (aux != NULL) {
-        if (is_equal(tree, aux->pair->key, key)){
-            tree->current = aux;
+    while (aux != NULL) {                                   // Ciclo que compara por key hasta que se encuentra, siguiendo la lógica de la función lower_than.
+        if (is_equal(tree, aux->pair->key, key)){      
+            tree->current = aux;                            // Si se encontró se retorna el pair y se actualiza el current.
             return aux->pair;
         }
 
@@ -98,7 +133,7 @@ Pair * searchTreeMap(TreeMap * tree, void* key) {
         }
     }
     
-    return NULL;
+    return NULL;                                             // Si no se encontró retorna NULL.
 }
 
 
