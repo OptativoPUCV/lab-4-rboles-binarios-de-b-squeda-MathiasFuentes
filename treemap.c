@@ -128,7 +128,7 @@ void removeNode(TreeMap * tree, TreeNode* node) {
             else
                 node->parent->right = child;
 
-            child->parent = node->parent;
+            child->parent = node->parent;     
         }
         free(node->pair);
         free(node);    
@@ -137,12 +137,11 @@ void removeNode(TreeMap * tree, TreeNode* node) {
 
     // Tercer caso, nodo con 2 hijos:
     if ((node->left != NULL && node->right != NULL)){
-        TreeNode* succesor = minimum(node->right);
-        node->pair = succesor->pair;
+        TreeNode* succesor = minimum(node->right);      // Se reemplaza el nodo a eliminar por su siguiente sucesor,
+        node->pair = succesor->pair;                    // Después, se elimina el nodo donde estaba el sucesor, llamando a la función otra vez.
         removeNode(tree, succesor);
         return;
     }
-
 }
 
 void eraseTreeMap(TreeMap * tree, void* key){
@@ -180,8 +179,19 @@ Pair * upperBound(TreeMap * tree, void* key) {
     return NULL;
 }
 
+/*6.- Implemente las funciones para recorrer la estructura: 
+
+Pair* firstTreeMap(TreeMap* tree) retorna el primer Pair del mapa (el menor). 
+
+Pair* nextTreeMap(TreeMap* tree) retornar el siguiente Pair del mapa a partir del puntero TreeNode* current. Recuerde actualizar este puntero.*/
+
 Pair * firstTreeMap(TreeMap * tree) {
-    return NULL;
+    if (tree == NULL || tree->root == NULL) return NULL;
+    TreeNode* aux = tree->root;
+    while (aux->left != NULL){
+        aux = aux->left;
+    }
+    return aux;
 }
 
 Pair * nextTreeMap(TreeMap * tree) {
